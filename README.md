@@ -31,6 +31,8 @@ $$
 
 Note that these equations account for the fact that $Y$ positive points downwards in an html canvas. Also note that this simulation is 2D, so we are not considering the birds being able to change their altitude.
 
+In order to train the birds, food is introduced into the system. The reward for interacting with food far outweights any other rewards in the fitness function. The idea is that eventually this food can be replaced with the cursor and the birds will follow that around.
+
 ## Predator
 
 The dynamics of the predator are identical to the birds. For fun, the first aim will be to make the predator controllable by the user so that the birds learn to avoid the user, making it more and more difficult for the user to win the game with every iteration.

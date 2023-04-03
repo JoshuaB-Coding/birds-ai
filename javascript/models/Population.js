@@ -15,6 +15,8 @@ class Population {
             this.agents.push(new Agent(layerInformation));
         }
 
+        this.food = new Food();
+
         this.isRunning = true;
         this.timeRunning = 0;
     }

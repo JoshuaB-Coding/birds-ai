@@ -83,4 +83,20 @@ class Agent {
 
         return fitnessValue;
     }
+
+    eatFood(food) {
+        if (!this.isAlive) return false;
+
+        const dx = this.bird.X - food.X;
+        const dy = this.bird.Y - food.Y;
+        const distance = Math.sqrt( dx*dx + dy*dy );
+
+        if (distance < 10) {
+            this.fitness += 1000;
+            food.reset();
+            return true;
+        }
+        
+        return false;
+    }
 };
