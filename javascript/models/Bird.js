@@ -3,8 +3,11 @@ class Bird {
         this.X = X;
         this.Y = Y;
 
-        this.image = new Image();
-        this.image.src = "./assets/bird.png";
+        this.image_alive = new Image();
+        this.image_alive.src = "./assets/bird.png";
+
+        this.image_dead = new Image();
+        this.image_dead.src = "./assets/dead_bird.png";
 
         this.width = 40;
         this.height = 20;
@@ -28,10 +31,14 @@ class Bird {
     }
 
     render(context) {
+        let image;
+        if (this.isAlive) image = this.image_alive;
+        else image = this.image_dead;
+
         context.translate(this.X, this.Y);
         context.rotate(this.alpha);
         context.drawImage(
-            this.image,
+            image,
             -this.width / 2, -this.height / 2,
             this.scale * this.width, this.scale * this.height
         );
@@ -123,7 +130,8 @@ class Bird {
             this.bottomWallDistance(),
             this.leftWallDistance(),
             this.rightWallDistance(),
-            this.nearestBirdDistance(agents),
+            this.nearestBirdDistanceX(agents),
+            this.nearestBirdDistanceY(agents),
         ];
     }
 
@@ -143,8 +151,34 @@ class Bird {
         return CANVAS_WIDTH - this.X;
     }
 
-    nearestBirdDistance(agents) {
+    nearestBirdDistanceX(agents) {
         if (!agents) return 0;
+
+        let nearestDistance = Infinity;
+        for (const agent of agents) {
+            if (agent.bird === this) continue;
+
+            const dx = this.X - agent.bird.X;
+
+            if (Math.abs(nearestDistance) > Math.abs(dx)) nearestDistance = dx;
+        }
+
+        return nearestDistance;
+    }
+
+    nearestBirdDistanceY(agents) {
+        if (!agents) return 0;
+
+        let nearestDistance = Infinity;
+        for (const agent of agents) {
+            if (agent.bird === this) continue;
+
+            const dy = this.Y - agent.bird.Y;
+
+            if (Math.abs(nearestDistance) > Math.abs(dy)) nearestDistance = dy;
+        }
+
+        return nearestDistance;
     }
 
     increaseSpeed() {

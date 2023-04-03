@@ -45,10 +45,6 @@ class Agent {
         this.bird.render(context);
     }
 
-    checkBirdCollision() {
-
-    }
-
     performAction(speedPreference, turnPreference) {
         const maxSpeedPreference = Math.max(...speedPreference);
         const maxTurnPreference = Math.max(...turnPreference);

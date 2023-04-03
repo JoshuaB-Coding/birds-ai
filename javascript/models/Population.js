@@ -6,8 +6,8 @@ class Population {
         const numberOfLayers = 2;
         const layerInformation = new LayerInformation(
             numberOfLayers,
-            [0, 7],
-            [7, 6],
+            [0, 8],
+            [8, 6],
         );
 
         this.agents = [];
@@ -33,6 +33,8 @@ class Population {
             agent.update();
             if (agent.isAlive) this.isRunning = true;
         }
+
+        this.checkForBirdCollisions();
     }
 
     render(context) {
@@ -82,5 +84,44 @@ class Population {
         }
 
         return bestAgents;
+    }
+
+    checkForBirdCollisions() {
+        for (var agent of this.agents) {
+            if (!agent.isAlive) continue;
+
+            var closestAgent = this.findClosestAgent(agent);
+            if (closestAgent === null) continue; // all birds are dead except one
+
+            const dx = agent.bird.X - closestAgent.bird.X;
+            const dy = agent.bird.Y - closestAgent.bird.Y;
+            const distance = Math.sqrt( dx*dx + dy*dy );
+
+            if (distance < 20) {
+                agent.isAlive = false;
+                agent.bird.isAlive = false;
+                closestAgent.isAlive = false;
+                closestAgent.bird.isAlive = false;
+            }
+        }
+    }
+
+    findClosestAgent(targetAgent) {
+        var closestAgent = null;
+        var closestAgentDistance = Infinity;
+        for (const agent of this.agents) {
+            if (agent === targetAgent) continue;
+            if (!agent.isAlive) continue;
+
+            const dx = agent.bird.X - targetAgent.bird.X;
+            const dy = agent.bird.Y - targetAgent.bird.Y;
+            const distance = Math.sqrt( dx*dx + dy*dy );
+
+            if (distance < closestAgentDistance) {
+                closestAgentDistance = distance;
+                closestAgent = agent;
+            }
+        }
+        return closestAgent;
     }
 };

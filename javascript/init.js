@@ -1,7 +1,7 @@
 const CANVAS_WIDTH = 1200;
 const CANVAS_HEIGHT = 600;
 const RENDER_BIRD_PATH = false; // looks rubbish at the moment - update later
-const POPULATION_SIZE = 10;
+const POPULATION_SIZE = 30;
 const MAX_TIME = 30;
 const dt = 0.01;
 
