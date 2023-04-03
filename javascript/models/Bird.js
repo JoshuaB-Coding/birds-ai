@@ -122,16 +122,19 @@ class Bird {
         }
     }
 
-    state(agents) {
+    state(agents, foodArray) {
+        // Fix to account for bird line of sight and sight range
         return [
-            this.U,
-            this.alpha,
+            this.U, // turned off
+            this.alpha, // turned off
             this.topWallDistance(),
             this.bottomWallDistance(),
             this.leftWallDistance(),
             this.rightWallDistance(),
             this.nearestBirdDistanceX(agents),
             this.nearestBirdDistanceY(agents),
+            this.nearestFoodDistanceX(foodArray),
+            this.nearestFoodDistanceY(foodArray),
         ];
     }
 
@@ -158,8 +161,7 @@ class Bird {
         for (const agent of agents) {
             if (agent.bird === this) continue;
 
-            const dx = this.X - agent.bird.X;
-
+            const dx = agent.bird.X - this.X;
             if (Math.abs(nearestDistance) > Math.abs(dx)) nearestDistance = dx;
         }
 
@@ -173,8 +175,31 @@ class Bird {
         for (const agent of agents) {
             if (agent.bird === this) continue;
 
-            const dy = this.Y - agent.bird.Y;
+            const dy = agent.bird.Y - this.Y;
+            if (Math.abs(nearestDistance) > Math.abs(dy)) nearestDistance = dy;
+        }
 
+        return nearestDistance;
+    }
+
+    nearestFoodDistanceX(foodArray) {
+        if (!foodArray) return 0;
+
+        let nearestDistance = Infinity;
+        for (const food of foodArray) {
+            const dx = food.X - this.X;
+            if (Math.abs(nearestDistance) > Math.abs(dy)) nearestDistance = dx;
+        }
+
+        return nearestDistance;
+    }
+
+    nearestFoodDistanceY(foodArray) {
+        if (!foodArray) return 0;
+
+        let nearestDistance = Infinity;
+        for (const food of foodArray) {
+            const dy = food.Y - this.Y;
             if (Math.abs(nearestDistance) > Math.abs(dy)) nearestDistance = dy;
         }
 

@@ -11,3 +11,7 @@ canvas {
     border: 1px solid black;
     background-color: aqua;
 }
+
+h1 {
+    text-align: center;
+}

@@ -54,4 +54,10 @@ class NeuralNetwork {
             this.layers[i].copyLayer(neuralNetwork.layers[i]);
         }
     }
+
+    mutate() {
+        for (var layer of this.layers) {
+            layer.mutateAll();
+        }
+    }
 };

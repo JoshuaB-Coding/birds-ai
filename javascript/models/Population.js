@@ -6,8 +6,8 @@ class Population {
         const numberOfLayers = 2;
         const layerInformation = new LayerInformation(
             numberOfLayers,
-            [0, 8],
-            [8, 6],
+            [0, 10],
+            [10, 6],
         );
 
         this.agents = [];
@@ -15,10 +15,14 @@ class Population {
             this.agents.push(new Agent(layerInformation));
         }
 
-        this.food = new Food();
+        this.foodArray = [];
+        for (let _ = 0; _ < NUMBER_OF_FOOD; _++) {
+            this.foodArray.push(new Food());
+        }
 
         this.isRunning = true;
         this.timeRunning = 0;
+        this.generation = 1;
     }
 
     update() {
@@ -32,14 +36,18 @@ class Population {
 
         this.isRunning = false;
         for (var agent of this.agents) {
-            agent.update();
+            agent.update(this.agents, this.food);
             if (agent.isAlive) this.isRunning = true;
         }
 
         this.checkForBirdCollisions();
+        this.checkBirdEating();
     }
 
     render(context) {
+        for (const food of this.foodArray) {
+            food.render(context);
+        }
         for (const agent of this.agents) {
             agent.render(context);
         }
@@ -48,6 +56,10 @@ class Population {
     reset() {
         for (var agent of this.agents) {
             agent.reset();
+        }
+        // Add something to decrease number of food over time
+        for (var food of this.foodArray) {
+            food.reset();
         }
     }
 
@@ -68,6 +80,12 @@ class Population {
                 agent2.brain
             );
         }
+
+        for (var agent of bestAgents) {
+            agent.brain.mutate();
+        }
+
+        this.generation++;
     }
 
     bestPeformers() {
@@ -102,8 +120,25 @@ class Population {
             if (distance < 20) {
                 agent.isAlive = false;
                 agent.bird.isAlive = false;
+                agent.fitness *= 0.5; // half fitness score
+
                 closestAgent.isAlive = false;
                 closestAgent.bird.isAlive = false;
+                closestAgent.fitness *= 0.5; // half fitness score
+            }
+        }
+    }
+
+    checkBirdEating() {
+        for (var agent of this.agents) {
+            if (!agent.isAlive) continue;
+
+            var nearestFood = this.findClosestFood(agent);
+            if (nearestFood === null) continue;
+
+            if (agent.eatFood(nearestFood)) {
+                nearestFood.isEaten = true;
+                return;
             }
         }
     }
@@ -125,5 +160,23 @@ class Population {
             }
         }
         return closestAgent;
+    }
+
+    findClosestFood(targetAgent) {
+        var closestFood = null;
+        var closestFoodDistance = Infinity;
+        for (const food of this.foodArray) {
+            if (food.isEaten) continue;
+
+            const dx = food.X - targetAgent.bird.X;
+            const dy = food.Y - targetAgent.bird.Y;
+            const distance = Math.sqrt( dx*dx + dy*dy );
+
+            if (distance < closestFoodDistance) {
+                closestFoodDistance = distance;
+                closestFood = food;
+            }
+        }
+        return closestFood;
     }
 };

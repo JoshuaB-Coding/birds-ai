@@ -15,15 +15,15 @@ class Agent {
         this.fitness = 0;
     }
 
-    update(agents) {
-        const agentState = this.bird.state(agents);
+    update(agents, food) {
+        const agentState = this.bird.state(agents, food);
         this.fitness += this.fitnessFunction(agentState);
 
         if (!this.isAlive) return;
         
         const suggestedActions = this.brain.output(agentState);
 
-        // Perform Sigmoid transformation
+        // Perform Sigmoid transformation - very slow, limit input to Sigmoid
         var activation = [];
         for (let i = 0; i < suggestedActions.length; i++) {
             const sigmoid = 1.0 / ( 1.0 + Math.exp(-suggestedActions[i]) );
@@ -38,7 +38,11 @@ class Agent {
         this.performAction(speedPreference, turnPreference);
 
         this.bird.update();
-        this.isAlive = this.bird.isAlive;
+        if (this.isAlive === this.bird.isAlive) return; // no change in state
+
+        // Punish for running into walls
+        this.fitness *= 0.5;
+        this.isAlive = false;
     }
 
     render(context) {
@@ -49,18 +53,22 @@ class Agent {
         const maxSpeedPreference = Math.max(...speedPreference);
         const maxTurnPreference = Math.max(...turnPreference);
 
-        if (speedPreference[0] === maxSpeedPreference) {
-            this.bird.increaseSpeed();
+        if (speedPreference[0] !== maxSpeedPreference) {
+            if (speedPreference[1] === maxSpeedPreference) {
+                this.bird.increaseSpeed();
+            }
+            else if (speedPreference[2] === maxSpeedPreference) {
+                this.bird.decreaseSpeed();
+            }
         }
-        else if (speedPreference[1] === maxSpeedPreference) {
-            this.bird.decreaseSpeed();
-        }
-        
-        if (turnPreference[0] === maxTurnPreference) {
-            this.bird.turnRight();
-        }
-        else if (turnPreference[1] === maxTurnPreference) {
-            this.bird.turnLeft();
+
+        if (turnPreference[0] !== maxTurnPreference) {
+            if (turnPreference[1] === maxTurnPreference) {
+                this.bird.turnRight();
+            }
+            else if (turnPreference[2] === maxTurnPreference) {
+                this.bird.turnLeft();
+            }
         }
     }
 
@@ -78,8 +86,8 @@ class Agent {
 
         if (this.isAlive) fitnessValue += dt;
 
-        const distanceFromStart = this.bird.distanceFromStart();
-        fitnessValue += distanceFromStart / Math.max(CANVAS_WIDTH, CANVAS_HEIGHT);
+        // const distanceFromStart = this.bird.distanceFromStart();
+        // fitnessValue += distanceFromStart / Math.max(CANVAS_WIDTH, CANVAS_HEIGHT);
 
         return fitnessValue;
     }
@@ -91,9 +99,9 @@ class Agent {
         const dy = this.bird.Y - food.Y;
         const distance = Math.sqrt( dx*dx + dy*dy );
 
-        if (distance < 10) {
-            this.fitness += 1000;
-            food.reset();
+        if (distance < food.radius * 2) {
+            // Perhaps reward players for eating food more quickly
+            this.fitness += MAX_TIME / NUMBER_OF_FOOD * 10;
             return true;
         }
         
