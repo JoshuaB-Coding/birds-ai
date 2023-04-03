@@ -1,0 +1,13 @@
+#container {
+    position: relative;
+    text-align: center;
+}
+
+#container canvas, #overlay {
+    align-items: center;
+}
+
+canvas {
+    border: 1px solid black;
+    background-color: aqua;
+}
