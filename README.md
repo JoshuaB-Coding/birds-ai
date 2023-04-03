@@ -9,11 +9,11 @@ Given a domain of some set size and a population of $N$ birds, can they each lea
 
 Each bird has a neural network which takes the following information as inputs and outputs respectively.
 - Inputs
-  - Distance to nearest bird in both $X$ and $Y$
-  - Distance to top and bottom walls ($Y$ only)
-  - Distance to left and right walls ($X$ only)
   - Current speed
   - Current direction
+  - Distance to top and bottom walls ($Y$ only)
+  - Distance to left and right walls ($X$ only)
+  - Distance to nearest bird in both $X$ and $Y$
 - Outputs
   - Desire to increase speed (between 0 and 1)
   - Desire to decrease speed (between 0 and 1)
