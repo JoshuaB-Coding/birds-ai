@@ -20,9 +20,11 @@ class Bird {
         this.flight_path_X = [];
         this.flight_path_Y = [];
 
-        this.U = this.U_min;
-        this.alpha = 0;
+        this.U = this.generateRandomVelocity();
+        this.alpha = this.generateRandomAngle();
         this.isAlive = true;
+        this.X_START = this.X;
+        this.Y_START = this.Y;
     }
 
     render(context) {
@@ -63,22 +65,18 @@ class Bird {
     update() {
         if (!this.isAlive) return;
 
-        this.increaseSpeed();
-        this.turnLeft();
-
         this.updatePosition();
 
         if (RENDER_BIRD_PATH) {
             this.updateFlightPath();
         }
 
-        if (this.checkCollision()) {
+        if (this.checkWallCollision()) {
             this.isAlive = false;
-            console.log("OUCH!");
         }
     }
 
-    checkCollision() {
+    checkWallCollision() {
         if (this.topWallDistance() < 0) {
             this.Y = 0;
             return true;
@@ -117,7 +115,7 @@ class Bird {
         }
     }
 
-    state(birds) {
+    state(agents) {
         return [
             this.U,
             this.alpha,
@@ -125,7 +123,7 @@ class Bird {
             this.bottomWallDistance(),
             this.leftWallDistance(),
             this.rightWallDistance(),
-            this.nearestBirdDistance(birds),
+            this.nearestBirdDistance(agents),
         ];
     }
 
@@ -145,8 +143,8 @@ class Bird {
         return CANVAS_WIDTH - this.X;
     }
 
-    nearestBirdDistance(birds) {
-        if (!birds) return 0;
+    nearestBirdDistance(agents) {
+        if (!agents) return 0;
     }
 
     increaseSpeed() {
@@ -183,5 +181,29 @@ class Bird {
     correctFlightAngle() {
         if (this.alpha > 2 * Math.PI) this.alpha -= 2 * Math.PI;
         else if (this.alpha < 0) this.alpha += 2 * Math.PI;
+    }
+
+    generateRandomVelocity() {
+        return this.U_min + Math.random() * (this.U_max - this.U_min);
+    }
+
+    generateRandomAngle() {
+        return Math.random() * 2 * Math.PI;
+    }
+
+    reset(X, Y) {
+        this.X = X;
+        this.Y = Y;
+        this.U = this.generateRandomVelocity();
+        this.alpha = this.generateRandomAngle();
+        this.isAlive = true;
+        this.X_START = this.X;
+        this.Y_START = this.Y;
+    }
+
+    distanceFromStart() {
+        const dx = this.X - this.X_START;
+        const dy = this.Y - this.Y_START;
+        return Math.sqrt( dx*dx + dy*dy );
     }
 };
