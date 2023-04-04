@@ -28,6 +28,8 @@ class Bird {
         this.isAlive = true;
         this.X_START = this.X;
         this.Y_START = this.Y;
+
+        this.SEARCH_RADIUS = 40;
     }
 
     render(context) {
@@ -123,10 +125,10 @@ class Bird {
     }
 
     state(agents, foodArray) {
-        // Fix to account for bird line of sight and sight range
+        // Accounts for search radius in individual functions - bad practise
         return [
-            this.U, // turned off
-            this.alpha, // turned off
+            this.U * 0, // turned off
+            this.alpha * 0, // turned off
             this.topWallDistance(),
             this.bottomWallDistance(),
             this.leftWallDistance(),
@@ -139,19 +141,21 @@ class Bird {
     }
 
     topWallDistance() {
-        return this.Y;
+        return this.Y > this.SEARCH_RADIUS ? 0 : this.Y;
     }
 
     bottomWallDistance() {
-        return CANVAS_HEIGHT - this.Y;
+        const bottomWallDistance = CANVAS_HEIGHT - this.Y;
+        return bottomWallDistance > this.SEARCH_RADIUS ? 0 : bottomWallDistance;
     }
 
     leftWallDistance() {
-        return this.X;
+        return this.X > this.SEARCH_RADIUS ? 0 : this.X;
     }
 
     rightWallDistance() {
-        return CANVAS_WIDTH - this.X;
+        const rightWallDistance = CANVAS_WIDTH - this.X;
+        return rightWallDistance > this.SEARCH_RADIUS ? 0 : rightWallDistance;
     }
 
     nearestBirdDistanceX(agents) {
@@ -165,7 +169,7 @@ class Bird {
             if (Math.abs(nearestDistance) > Math.abs(dx)) nearestDistance = dx;
         }
 
-        return nearestDistance;
+        return nearestDistance > this.SEARCH_RADIUS ? 0 : nearestDistance;
     }
 
     nearestBirdDistanceY(agents) {
@@ -179,7 +183,7 @@ class Bird {
             if (Math.abs(nearestDistance) > Math.abs(dy)) nearestDistance = dy;
         }
 
-        return nearestDistance;
+        return nearestDistance > this.SEARCH_RADIUS ? 0 : nearestDistance;
     }
 
     nearestFoodDistanceX(foodArray) {
@@ -187,11 +191,12 @@ class Bird {
 
         let nearestDistance = Infinity;
         for (const food of foodArray) {
+            if (food.isEaten) continue;
             const dx = food.X - this.X;
             if (Math.abs(nearestDistance) > Math.abs(dy)) nearestDistance = dx;
         }
 
-        return nearestDistance;
+        return nearestDistance > this.SEARCH_RADIUS ? 0 : nearestDistance;
     }
 
     nearestFoodDistanceY(foodArray) {
@@ -199,11 +204,12 @@ class Bird {
 
         let nearestDistance = Infinity;
         for (const food of foodArray) {
+            if (food.isEaten) continue;
             const dy = food.Y - this.Y;
             if (Math.abs(nearestDistance) > Math.abs(dy)) nearestDistance = dy;
         }
 
-        return nearestDistance;
+        return nearestDistance > this.SEARCH_RADIUS ? 0 : nearestDistance;
     }
 
     increaseSpeed() {
